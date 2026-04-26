@@ -4,6 +4,9 @@ import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.post('/process', authenticate, paymentController.pay);
+router.use(authenticate);
+
+router.post('/create-order', paymentController.createOrder);
+router.post('/verify', paymentController.verifyPayment);
 
 export default router;

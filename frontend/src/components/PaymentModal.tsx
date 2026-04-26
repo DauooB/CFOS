@@ -18,7 +18,7 @@ type PaymentMethod = 'UPI' | 'Card' | 'Cash';
 export default function PaymentModal({ isOpen, onClose, totalAmount, cartItems, onSuccess }: PaymentModalProps) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { token, isAuthenticated } = useAuth();
+  const { user, token, isAuthenticated } = useAuth();
 
   if (!isOpen) return null;
 
@@ -33,29 +33,91 @@ export default function PaymentModal({ isOpen, onClose, totalAmount, cartItems, 
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
       
-      // 1. Place the order
-      const orderResponse = await axios.post(
-        `${apiUrl}/orders`, 
-        {
-          items: cartItems.map(item => ({
-            item_id: Number(item.product.id), // Ensure it's a number
-            quantity: item.quantity
-          }))
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      // If Razorpay is selected (either UPI or Card)
+      if (selectedMethod === 'UPI' || selectedMethod === 'Card') {
+        // 1. Create Razorpay Order on Backend
+        const orderRes = await axios.post(
+          `${apiUrl}/payments/create-order`, 
+          { amount: totalAmount },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      // 2. Mock payment processing delay
-      setTimeout(() => {
-        setIsProcessing(false);
-        onSuccess();
-      }, 1000);
+        const rzpOrder = orderRes.data;
+
+        // 2. Configure Razorpay Options
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: rzpOrder.amount,
+          currency: "INR",
+          name: "IIIT NR Canteen",
+          description: "Food Order Payment",
+          order_id: rzpOrder.id,
+          handler: async (response: any) => {
+            try {
+              // 3. Verify Payment on Backend
+              await axios.post(
+                `${apiUrl}/payments/verify`,
+                {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+              // 4. Finalize the internal Order in our DB
+              await axios.post(
+                `${apiUrl}/orders`, 
+                {
+                  items: cartItems.map(item => ({
+                    item_id: Number(item.product.id),
+                    quantity: item.quantity
+                  }))
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+
+              onSuccess();
+            } catch (err) {
+              alert("Payment verification failed!");
+            } finally {
+              setIsProcessing(false);
+            }
+          },
+          prefill: {
+            name: user?.name,
+            email: user?.email,
+          },
+          theme: { color: "#0f172a" },
+          modal: {
+            ondismiss: () => setIsProcessing(false)
+          }
+        };
+
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      } else {
+        // Cash at Counter (Mock flow)
+        await axios.post(
+          `${apiUrl}/orders`, 
+          {
+            items: cartItems.map(item => ({
+              item_id: Number(item.product.id),
+              quantity: item.quantity
+            }))
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        setTimeout(() => {
+          setIsProcessing(false);
+          onSuccess();
+        }, 1000);
+      }
 
     } catch (error: any) {
       console.error('Order Error:', error.response?.data || error.message);
-      alert('Failed to place order: ' + (error.response?.data?.error?.message || 'Check connection'));
+      alert('Failed: ' + (error.response?.data?.error?.message || 'Check connection'));
       setIsProcessing(false);
     }
   };
