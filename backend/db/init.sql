@@ -25,6 +25,7 @@ CREATE TABLE food_items (
     description TEXT,
     price DECIMAL(10, 2) NOT NULL,
     category VARCHAR(50),
+    image VARCHAR(255),
     is_available BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP

@@ -29,7 +29,7 @@ export class CartController {
 
     async updateQuantity(req: AuthRequest, res: Response) {
         const userId = req.user!.userId;
-        const itemId = parseInt(req.params.itemId);
+        const itemId = parseInt(req.params.itemId as string);
         const { quantity } = updateQuantitySchema.parse(req.body);
         await cartService.updateQuantity(userId, itemId, quantity);
         const updatedCart = await cartService.getCart(userId);
@@ -38,7 +38,7 @@ export class CartController {
 
     async removeFromCart(req: AuthRequest, res: Response) {
         const userId = req.user!.userId;
-        const itemId = parseInt(req.params.itemId);
+        const itemId = parseInt(req.params.itemId as string);
         await cartService.removeFromCart(userId, itemId);
         const updatedCart = await cartService.getCart(userId);
         res.status(200).json(updatedCart);

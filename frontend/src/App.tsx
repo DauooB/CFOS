@@ -82,6 +82,29 @@ function App() {
     }
   };
 
+  const updateQuantity = async (productId: string, quantity: number) => {
+    if (!isAuthenticated) {
+      if (quantity <= 0) {
+        setCart(prev => prev.filter(item => item.product.id !== productId));
+      } else {
+        setCart(prev => prev.map(item => 
+          item.product.id === productId ? { ...item, quantity } : item
+        ));
+      }
+      return;
+    }
+
+    try {
+      const res = await axios.put(`${apiUrl}/cart/${productId}`, 
+        { quantity },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCart(res.data);
+    } catch (error) {
+      console.error('Update Quantity Error:', error);
+    }
+  };
+
   const clearCart = async () => {
     if (isAuthenticated) {
       await axios.delete(`${apiUrl}/cart`, {
@@ -115,6 +138,7 @@ function App() {
         onClose={() => setIsCartOpen(false)} 
         cart={cart}
         onRemove={removeFromCart}
+        onUpdateQuantity={updateQuantity}
         onCheckout={() => {
           setIsCartOpen(false);
           setIsPaymentOpen(true);

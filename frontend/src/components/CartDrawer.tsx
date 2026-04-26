@@ -1,4 +1,4 @@
-import { X, ShoppingCart } from 'lucide-react';
+import { X, ShoppingCart, Minus, Plus } from 'lucide-react';
 import type { CartItem } from '../types';
 import clsx from 'clsx';
 
@@ -7,10 +7,11 @@ interface CartDrawerProps {
   onClose: () => void;
   cart: CartItem[];
   onRemove: (productId: string) => void;
+  onUpdateQuantity: (productId: string, quantity: number) => void;
   onCheckout: () => void;
 }
 
-export default function CartDrawer({ isOpen, onClose, cart, onRemove, onCheckout }: CartDrawerProps) {
+export default function CartDrawer({ isOpen, onClose, cart, onRemove, onUpdateQuantity, onCheckout }: CartDrawerProps) {
   const totalAmount = cart.reduce((acc, item) => acc + (item.product.price * item.quantity), 0);
 
   return (
@@ -54,8 +55,23 @@ export default function CartDrawer({ isOpen, onClose, cart, onRemove, onCheckout
                     </button>
                   </div>
                   <div className="flex justify-between items-end">
-                    <div className="text-sm font-medium text-slate-900 flex items-center gap-1">
-                      <span className="text-slate-500 text-[13px]">{item.quantity} x</span> ₹{item.product.price}
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center border border-gray-200 rounded-md bg-white shadow-sm">
+                        <button 
+                          onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
+                          className="p-1 text-slate-500 hover:text-slate-900 transition-colors"
+                        >
+                          <Minus size={14} />
+                        </button>
+                        <span className="text-[13px] font-semibold w-5 text-center text-slate-900">{item.quantity}</span>
+                        <button 
+                          onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
+                          className="p-1 text-slate-500 hover:text-slate-900 transition-colors"
+                        >
+                          <Plus size={14} />
+                        </button>
+                      </div>
+                      <span className="text-sm font-medium text-slate-500">₹{item.product.price}</span>
                     </div>
                     <p className="text-[15px] font-bold text-slate-900">
                       ₹{item.product.price * item.quantity}
