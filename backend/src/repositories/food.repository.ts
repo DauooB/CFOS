@@ -16,11 +16,11 @@ export class FoodRepository {
 
   async create(item: CreateFoodItemDTO): Promise<FoodItem> {
     const query = `
-      INSERT INTO food_items (name, description, price, category, is_available)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO food_items (name, description, price, category, is_available, image)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *
     `;
-    const values = [item.name, item.description, item.price, item.category, item.is_available ?? true];
+    const values = [item.name, item.description, item.price, item.category, item.is_available ?? true, item.image || null];
     const result = await db.query(query, values);
     return result.rows[0];
   }

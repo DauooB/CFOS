@@ -27,11 +27,11 @@ const AdminDashboard = () => {
       <div className="bg-white p-6 rounded-lg shadow grid grid-cols-2 gap-4">
         <div className="bg-blue-100 p-4 rounded-lg text-center">
           <h3 className="text-xl font-semibold text-blue-800">Daily Sales</h3>
-          <p className="text-3xl font-bold text-blue-600">${sales.daily.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-blue-600">₹{sales.daily.toFixed(2)}</p>
         </div>
         <div className="bg-green-100 p-4 rounded-lg text-center">
           <h3 className="text-xl font-semibold text-green-800">Monthly Sales</h3>
-          <p className="text-3xl font-bold text-green-600">${sales.monthly.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-green-600">₹{sales.monthly.toFixed(2)}</p>
         </div>
       </div>
       

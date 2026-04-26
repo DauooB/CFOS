@@ -6,7 +6,7 @@ const KitchenDashboard = () => {
   const { token } = useAuth();
   const [orders, setOrders] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', image: '' });
   const apiUrl = import.meta.env.VITE_API_URL;
 
   const fetchOrders = async () => {
@@ -32,6 +32,8 @@ const KitchenDashboard = () => {
   useEffect(() => {
     fetchOrders();
     fetchProducts();
+    const intervalId = setInterval(fetchOrders, 5000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const updateOrderStatus = async (id: number, status: string) => {
@@ -77,7 +79,7 @@ const KitchenDashboard = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchProducts();
-      setNewProduct({ name: '', price: '', category: '' });
+      setNewProduct({ name: '', price: '', category: '', image: '' });
     } catch (error) {
       console.error('Error adding product:', error);
     }
@@ -91,7 +93,7 @@ const KitchenDashboard = () => {
           {orders.map(order => (
             <div key={order.id} className="border p-4 rounded flex justify-between items-center">
               <div>
-                <p><strong>Order #{order.id}</strong> - ${order.total_amount}</p>
+                <p><strong>Order #{order.id}</strong> - ₹{order.total_amount}</p>
                 <p>Status: {order.status}</p>
               </div>
               <div className="space-x-2">
@@ -113,10 +115,11 @@ const KitchenDashboard = () => {
 
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-2xl font-bold mb-4">Products</h2>
-        <form onSubmit={addProduct} className="mb-6 flex gap-4">
+        <form onSubmit={addProduct} className="mb-6 flex gap-4 flex-wrap">
           <input type="text" placeholder="Name" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="border p-2 rounded" required />
-          <input type="number" placeholder="Price" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="border p-2 rounded" required />
+          <input type="number" placeholder="Price (₹)" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="border p-2 rounded" required />
           <input type="text" placeholder="Category" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="border p-2 rounded" />
+          <input type="url" placeholder="Image URL (optional)" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="border p-2 rounded" />
           <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Add Product</button>
         </form>
 
@@ -125,7 +128,7 @@ const KitchenDashboard = () => {
             <div key={product.id} className="border p-4 rounded flex flex-col justify-between">
               <div>
                 <h3 className="font-bold">{product.name}</h3>
-                <p>${product.price}</p>
+                <p>₹{product.price}</p>
                 <p>Status: {product.is_available ? 'Available' : 'Out of Stock'}</p>
               </div>
               <div className="mt-4 flex gap-2">

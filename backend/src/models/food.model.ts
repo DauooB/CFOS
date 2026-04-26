@@ -15,4 +15,5 @@ export interface CreateFoodItemDTO {
   price: number;
   category?: string;
   is_available?: boolean;
+  image?: string;
 }

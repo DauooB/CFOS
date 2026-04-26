@@ -40,6 +40,8 @@ export default function Profile({ setActiveTab }: ProfileProps) {
     };
 
     fetchOrders();
+    const intervalId = setInterval(fetchOrders, 5000);
+    return () => clearInterval(intervalId);
   }, [isAuthenticated, token]);
 
   if (!isAuthenticated) {

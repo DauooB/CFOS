@@ -7,7 +7,8 @@ const createFoodSchema = z.object({
   description: z.string().optional(),
   price: z.number().positive(),
   category: z.string().optional(),
-  is_available: z.boolean().optional()
+  is_available: z.boolean().optional(),
+  image: z.string().optional()
 });
 
 export class FoodController {
