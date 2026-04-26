@@ -5,8 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 
 interface HeaderProps {
-  activeTab: 'Menu' | 'Profile';
-  setActiveTab: (tab: 'Menu' | 'Profile') => void;
+  activeTab: 'Menu' | 'Profile' | 'Kitchen' | 'Admin';
+  setActiveTab: (tab: 'Menu' | 'Profile' | 'Kitchen' | 'Admin') => void;
   cartItemsCount: number;
   onOpenCart: () => void;
 }
@@ -89,6 +89,37 @@ export default function Header({ activeTab, setActiveTab, cartItemsCount, onOpen
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full"></span>
             )}
           </button>
+          
+          {(user?.role === 'Kitchen' || user?.role === 'Admin') && (
+            <button
+              onClick={() => setActiveTab('Kitchen')}
+              className={clsx(
+                "flex items-center pb-4 text-sm font-medium transition-colors relative",
+                activeTab === 'Kitchen' ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Kitchen
+              {activeTab === 'Kitchen' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full"></span>
+              )}
+            </button>
+          )}
+
+          {user?.role === 'Admin' && (
+            <button
+              onClick={() => setActiveTab('Admin')}
+              className={clsx(
+                "flex items-center pb-4 text-sm font-medium transition-colors relative",
+                activeTab === 'Admin' ? "text-slate-900" : "text-slate-500 hover:text-slate-700"
+              )}
+            >
+              Admin
+              {activeTab === 'Admin' && (
+                <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-slate-900 rounded-t-full"></span>
+              )}
+            </button>
+          )}
+
           <button
             onClick={() => setActiveTab('Profile')}
             className={clsx(

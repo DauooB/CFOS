@@ -4,7 +4,8 @@ export interface Product {
   description: string;
   price: number;
   category: string;
-  image: string;
+  image?: string;
+  is_available?: boolean;
 }
 
 export const categories = ['All', 'Breakfast', 'Lunch', 'Snacks', 'Beverages'];

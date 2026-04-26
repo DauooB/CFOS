@@ -18,6 +18,14 @@ export class FoodService {
     }
     return item;
   }
+
+  async updatePrice(id: number, price: number) {
+    const item = await foodRepository.updatePrice(id, price);
+    if (!item) {
+      throw new NotFoundError('Food item not found');
+    }
+    return item;
+  }
 }
 
 export const foodService = new FoodService();

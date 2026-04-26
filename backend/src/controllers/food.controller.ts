@@ -28,6 +28,13 @@ export class FoodController {
     const item = await foodService.toggleAvailability(id, is_available);
     res.status(200).json(item);
   }
+
+  async updatePrice(req: Request, res: Response) {
+    const id = parseInt(req.params.id as string);
+    const { price } = req.body;
+    const item = await foodService.updatePrice(id, price);
+    res.status(200).json(item);
+  }
 }
 
 export const foodController = new FoodController();

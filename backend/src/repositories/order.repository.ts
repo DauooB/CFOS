@@ -56,6 +56,34 @@ export class OrderRepository {
     const result = await db.query(query, [status, id]);
     return result.rows[0] || null;
   }
+
+  async findAll(): Promise<Order[]> {
+    const query = 'SELECT * FROM orders ORDER BY order_date DESC';
+    const result = await db.query(query);
+    return result.rows;
+  }
+
+  async getSalesData(): Promise<{ daily: number, monthly: number }> {
+    const dailyQuery = `
+      SELECT COALESCE(SUM(total_amount), 0) as total
+      FROM orders
+      WHERE status = 'Completed' AND DATE(order_date) = CURRENT_DATE
+    `;
+    const monthlyQuery = `
+      SELECT COALESCE(SUM(total_amount), 0) as total
+      FROM orders
+      WHERE status = 'Completed' AND 
+            EXTRACT(MONTH FROM order_date) = EXTRACT(MONTH FROM CURRENT_DATE) AND
+            EXTRACT(YEAR FROM order_date) = EXTRACT(YEAR FROM CURRENT_DATE)
+    `;
+    const dailyResult = await db.query(dailyQuery);
+    const monthlyResult = await db.query(monthlyQuery);
+
+    return {
+      daily: parseFloat(dailyResult.rows[0].total),
+      monthly: parseFloat(monthlyResult.rows[0].total)
+    };
+  }
 }
 
 export const orderRepository = new OrderRepository();

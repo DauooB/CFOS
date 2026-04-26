@@ -7,5 +7,6 @@ const router = Router();
 router.get('/', foodController.getMenu);
 router.post('/', authenticate, authorize('Admin', 'Kitchen'), foodController.createItem);
 router.patch('/:id/availability', authenticate, authorize('Admin', 'Kitchen'), foodController.toggleStatus);
+router.patch('/:id/price', authenticate, authorize('Admin', 'Kitchen'), foodController.updatePrice);
 
 export default router;

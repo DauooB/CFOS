@@ -5,12 +5,14 @@ import Menu from './components/Menu';
 import Profile from './components/Profile';
 import CartDrawer from './components/CartDrawer';
 import PaymentModal from './components/PaymentModal';
+import KitchenDashboard from './components/KitchenDashboard';
+import AdminDashboard from './components/AdminDashboard';
 import { useAuth } from './context/AuthContext';
 import type { Product } from './data/mockData';
 import type { CartItem } from './types';
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'Menu' | 'Profile'>('Menu');
+  const [activeTab, setActiveTab] = useState<'Menu' | 'Profile' | 'Kitchen' | 'Admin'>('Menu');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const { token, isAuthenticated } = useAuth();
@@ -126,11 +128,10 @@ function App() {
       />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'Menu' ? (
-          <Menu onAddToCart={addToCart} />
-        ) : (
-          <Profile setActiveTab={setActiveTab} />
-        )}
+        {activeTab === 'Menu' && <Menu onAddToCart={addToCart} />}
+        {activeTab === 'Profile' && <Profile setActiveTab={setActiveTab} />}
+        {activeTab === 'Kitchen' && <KitchenDashboard />}
+        {activeTab === 'Admin' && <AdminDashboard />}
       </main>
 
       <CartDrawer 

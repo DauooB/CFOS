@@ -30,6 +30,12 @@ export class FoodRepository {
     const result = await db.query(query, [isAvailable, id]);
     return result.rows[0] || null;
   }
+
+  async updatePrice(id: number, price: number): Promise<FoodItem | null> {
+    const query = 'UPDATE food_items SET price = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *';
+    const result = await db.query(query, [price, id]);
+    return result.rows[0] || null;
+  }
 }
 
 export const foodRepository = new FoodRepository();

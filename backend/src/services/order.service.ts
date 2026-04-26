@@ -57,6 +57,14 @@ export class OrderService {
       throw new ValidationError('Orders can only be placed between 08:00 AM and 06:00 PM');
     }
   }
+
+  async getAllOrders() {
+    return await orderRepository.findAll();
+  }
+
+  async getSalesData() {
+    return await orderRepository.getSalesData();
+  }
 }
 
 export const orderService = new OrderService();

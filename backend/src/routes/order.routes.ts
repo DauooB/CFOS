@@ -8,6 +8,8 @@ router.use(authenticate);
 
 router.post('/', orderController.placeOrder);
 router.get('/my-orders', orderController.getMyOrders);
+router.get('/', authorize('Admin', 'Kitchen'), orderController.getAllOrders);
+router.get('/sales', authorize('Admin'), orderController.getSalesData);
 router.patch('/:id/status', authorize('Admin', 'Kitchen'), orderController.updateStatus);
 
 export default router;

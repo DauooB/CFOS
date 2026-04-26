@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { categories, products } from '../data/mockData';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { categories } from '../data/mockData';
 import type { Product } from '../data/mockData';
 import ProductCard from './ProductCard';
 import clsx from 'clsx';
@@ -12,11 +13,25 @@ interface MenuProps {
 export default function Menu({ onAddToCart }: MenuProps) {
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL;
+        const res = await axios.get(`${apiUrl}/menu`);
+        setProducts(res.data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredProducts = products.filter(p => {
     const matchesCategory = activeCategory === 'All' || p.category === activeCategory;
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                         p.description.toLowerCase().includes(searchQuery.toLowerCase());
+                         (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()));
     return matchesCategory && matchesSearch;
   });
 

@@ -31,6 +31,16 @@ export class OrderController {
     const order = await orderService.updateOrderStatus(orderId, status);
     res.status(200).json(order);
   }
+
+  async getAllOrders(req: AuthRequest, res: Response) {
+    const orders = await orderService.getAllOrders();
+    res.status(200).json(orders);
+  }
+
+  async getSalesData(req: AuthRequest, res: Response) {
+    const sales = await orderService.getSalesData();
+    res.status(200).json(sales);
+  }
 }
 
 export const orderController = new OrderController();
