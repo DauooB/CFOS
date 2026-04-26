@@ -1,5 +1,5 @@
 import { X, ShoppingCart } from 'lucide-react';
-import type { CartItem } from '../App';
+import type { CartItem } from '../types';
 import clsx from 'clsx';
 
 interface CartDrawerProps {

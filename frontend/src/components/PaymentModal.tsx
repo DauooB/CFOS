@@ -1,30 +1,63 @@
 import { X, CreditCard, Banknote, Smartphone } from 'lucide-react';
 import { useState } from 'react';
 import clsx from 'clsx';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import type { CartItem } from '../types';
 
 interface PaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
   totalAmount: number;
+  cartItems: CartItem[];
   onSuccess: () => void;
 }
 
 type PaymentMethod = 'UPI' | 'Card' | 'Cash';
 
-export default function PaymentModal({ isOpen, onClose, totalAmount, onSuccess }: PaymentModalProps) {
+export default function PaymentModal({ isOpen, onClose, totalAmount, cartItems, onSuccess }: PaymentModalProps) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { token, isAuthenticated } = useAuth();
 
   if (!isOpen) return null;
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (!selectedMethod) return;
+    if (!isAuthenticated) {
+      alert('Please sign in to place an order');
+      return;
+    }
+
     setIsProcessing(true);
-    // Mock processing delay
-    setTimeout(() => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      
+      // 1. Place the order
+      const orderResponse = await axios.post(
+        `${apiUrl}/orders`, 
+        {
+          items: cartItems.map(item => ({
+            item_id: Number(item.product.id), // Ensure it's a number
+            quantity: item.quantity
+          }))
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      // 2. Mock payment processing delay
+      setTimeout(() => {
+        setIsProcessing(false);
+        onSuccess();
+      }, 1000);
+
+    } catch (error: any) {
+      console.error('Order Error:', error.response?.data || error.message);
+      alert('Failed to place order: ' + (error.response?.data?.error?.message || 'Check connection'));
       setIsProcessing(false);
-      onSuccess();
-    }, 1500);
+    }
   };
 
   const methods = [
